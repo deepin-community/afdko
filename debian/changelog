@@ -1,0 +1,76 @@
+afdko (3.6.2+dfsg1-1) unstable; urgency=medium
+
+  * New upstream version 3.6.2+dfsg1
+  * d/control: Update dependencies
+
+ -- Yao Wei (魏銘廷) <mwei@debian.org>  Sun, 16 May 2021 22:29:10 +0800
+
+afdko (3.6.0+dfsg1-3) unstable; urgency=medium
+
+  * Team upload.
+  * debian/rules
+    - Add hardening option
+    - Set CPPFLAGS and LDFLAGS via XFLAGS
+
+ -- Hideki Yamane <henrich@debian.org>  Sun, 14 Feb 2021 23:15:29 +0900
+
+afdko (3.6.0+dfsg1-2) unstable; urgency=medium
+
+  * Team upload.
+  * debian/control
+    - Adjust Build-Depends with cu2qu removal (Closes: #982697)
+  * debian/rules
+    - Ignore error at dh_auto_clean target
+  * Update extend-diff-ignore in debian/source/options
+  * Add debian/salsa-ci.yml
+
+ -- Hideki Yamane <henrich@debian.org>  Sun, 14 Feb 2021 10:46:05 +0900
+
+afdko (3.6.0+dfsg1-1) unstable; urgency=medium
+
+  * New upstream version 3.6.0+dfsg1
+  * debian/control:
+    - Update dependencies
+    - debian/control: Bump Standards-Version to 4.5.1. No other changes are
+      needed.
+  * debian/watch: Handle pre-release version
+  * debian/rules: Make setuptools-scm know the version of the package
+
+ -- Yao Wei (魏銘廷) <mwei@debian.org>  Fri, 01 Jan 2021 19:05:48 +0800
+
+afdko (3.5.1+dfsg1-1) unstable; urgency=medium
+
+  * New upstream version 3.5.1+dfsg1
+  * debian/control: Update dependencies
+
+ -- Yao Wei (魏銘廷) <mwei@debian.org>  Sat, 10 Oct 2020 23:11:31 +0800
+
+afdko (3.5.0+dfsg1-1) unstable; urgency=medium
+
+  * New upstream version 3.5.0+dfsg1
+  * Move afdko binaries to /usr/libexec and provide script `afdko` for
+    interfacing the binaries (Closes: #965151)
+  * debian/control:
+    - Swap maintainer and uploader; maintainer is now Debian Fonts Task Force
+    - Update dependencies
+    - Add python3 as afdko dependency to avoid lintian error
+  * debian/afdko.install: Remove binaries that don't exist in afdko
+
+ -- Yao Wei (魏銘廷) <mwei@debian.org>  Sun, 26 Jul 2020 00:37:33 +0800
+
+afdko (3.4.0+dfsg1-2) unstable; urgency=medium
+
+  * Team upload.
+  * Source-only upload for testing migration.
+  * Update Homepage field.
+  * debian/upstream/metadata: Document GitHub repo.
+
+ -- Boyuan Yang <byang@debian.org>  Wed, 15 Jul 2020 11:40:11 -0400
+
+afdko (3.4.0+dfsg1-1) unstable; urgency=medium
+
+  * Initial release (Closes: #762252)
+  * Remove tests temporarily.  Licenses on the font files need to be checked
+    throughly.
+
+ -- Yao Wei (魏銘廷) <mwei@debian.org>  Thu, 25 Jun 2020 19:24:09 +0800

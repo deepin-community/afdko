@@ -1,0 +1,9 @@
+debian/tmp/usr/bin/detype1 usr/libexec/afdko/
+debian/tmp/usr/bin/makeotfexe usr/libexec/afdko/
+debian/tmp/usr/bin/mergefonts usr/libexec/afdko/
+debian/tmp/usr/bin/rotatefont usr/libexec/afdko/
+debian/tmp/usr/bin/sfntdiff usr/libexec/afdko/
+debian/tmp/usr/bin/sfntedit usr/libexec/afdko/
+debian/tmp/usr/bin/spot usr/libexec/afdko/
+debian/tmp/usr/bin/tx usr/libexec/afdko/
+debian/tmp/usr/bin/type1 usr/libexec/afdko/
