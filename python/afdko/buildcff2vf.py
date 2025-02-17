@@ -23,7 +23,7 @@ from fontTools.varLib.cff import (CFF2CharStringMergePen,
 
 from afdko.fdkutils import validate_path
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 STAT_FILENAME = 'override.STAT.ttx'
 
@@ -140,8 +140,8 @@ class CompatibilityPen(CFF2CharStringMergePen):
 
     def make_flat_curve(self, cur_coords):
         # Convert line coords to curve coords.
-        dx = self.roundNumber(cur_coords[0] / 3.0)
-        dy = self.roundNumber(cur_coords[1] / 3.0)
+        dx = self.round(cur_coords[0] / 3.0)
+        dy = self.round(cur_coords[1] / 3.0)
         new_coords = [dx, dy, dx, dy,
                       cur_coords[0] - 2 * dx,
                       cur_coords[1] - 2 * dy]
@@ -572,7 +572,7 @@ def main(args=None):
     except VarLibCFFPointTypeMergeError:
         logger.error("The input set requires compatibilization. Please try "
                      "again with the -c (--check-compat) option.")
-        return 0
+        return 1
 
     if not options.keep_glyph_names:
         suppress_glyph_names(varFont)

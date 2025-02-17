@@ -37,21 +37,21 @@ static void fileError(File *fyl) {
     fatal(SFED_MSG_sysFERRORSTR, strerror(errno), fyl->name);
 }
 
-int fileExists(char *filename) {
+int fileExists(const char *filename) {
     return (sysFileExists(filename));
 }
 
 /* Open file read-only */
-void fileOpenRead(char *filename, File *fyl) {
+void fileOpenRead(const char *filename, File *fyl) {
     {
         fyl->fp = sysOpenSearchpath(filename);
+        fyl->name = filename;
         if (fyl->fp == NULL)
             fileError(fyl);
-        fyl->name = filename;
     }
 }
 
-void fileOpenWrite(char *filename, File *fyl) {
+void fileOpenWrite(const char *filename, File *fyl) {
     static char Wfnam[256];
     {
         if (!doingScripting) {

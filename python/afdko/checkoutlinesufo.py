@@ -77,6 +77,8 @@ class FontFile(object):
         else:
             print("Converting to temp UFO font...")
             self.temp_ufo_path = temp_path = get_temp_dir_path('font.ufo')
+            if self.font_format == 'PFC':
+                self.ufo_format = UFOFormatVersion.FORMAT_2_0
 
             if not run_shell_command([
                     'tx', '-ufo', font_path, temp_path]):
@@ -111,7 +113,8 @@ class FontFile(object):
         else:
             if self.ufo_format <= UFOFormatVersion.FORMAT_2_0:
                 # Up-convert the UFO to format 3
-                warnings.warn("The UFO was up-converted to format 3.")
+                warnings.warn("The UFO was up-converted to format 3.",
+                              UserWarning, stacklevel=2)
                 self.ufo_format = UFOFormatVersion.FORMAT_3_0
 
                 with UFOWriter(self.defcon_font.path,
@@ -127,6 +130,12 @@ class FontFile(object):
             layer = layers[PROCD_GLYPHS_LAYER_NAME]
             glyph_set = writer.getGlyphSet(
                 layerName=PROCD_GLYPHS_LAYER_NAME, defaultLayer=False)
+            if self.font_format == "PFC":
+                libs = {}
+                for f in layers.defaultLayer._glyphs.items():
+                    libs[f[0]] = f[1].lib
+                for g in layer._glyphs.items():
+                    g[1].lib = libs[g[0]]
             writer.writeLayerContents(layers.layerOrder)
             layer.save(glyph_set)
 
@@ -991,6 +1000,8 @@ def run(args=None):
     font_file = FontFile(font_path, font_format)
     use_hash_map = True if font_format == 'UFO' else False
     defcon_font = font_file.open(use_hash_map)
+    if font_format == 'PFC':
+        font_format = 'UFO'
 
     # We allow use of a hash map to skip glyphs only if fixing glyphs
     if options.clear_hash_map:
@@ -1030,9 +1041,11 @@ def run(args=None):
 
     max_length = max([len(g) for g in glyph_list])
     fmt = '{:<%d}' % max_length
-    with trange(len(glyph_list)) as t:
+    glyph_list = sorted(glyph_list)
+    list_length = len(glyph_list)
+    with trange(list_length) as t:
         for i in t:
-            glyph_name = sorted(glyph_list)[i]
+            glyph_name = glyph_list[i]
             t.set_description('Checking outlines for %s' %
                               fmt.format(glyph_name))
             changed = False
@@ -1108,7 +1121,7 @@ def run(args=None):
             # The following is needed when the script is called from another
             # script with Popen():
             sys.stdout.flush()
-            if i == len(glyph_list) - 1:
+            if i == list_length - 1:
                 t.set_description("Finished checkoutlinesufo")
 
     # update layer plist: the hash check call may have deleted processed layer

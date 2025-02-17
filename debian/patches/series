@@ -1,0 +1,4 @@
+skip-antlr-version-check.patch
+remove-cmake-ninja-requirement.patch
+no-external-antlr4.patch
+fix-escape-syntax-warning.patch

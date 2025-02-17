@@ -1,6 +1,197 @@
 Changelog
 =========
 
+4.0.1 (released 2024-01-16)
+---------------------------
+- [tx] Fix build failures discovered by an upcoming gcc-14 release (thanks @trofi!)([#1730](https://github.com/adobe-type-tools/afdko/pull/1730))
+- [tx] parse multiple attrs in xmlNode ([#1720](https://github.com/adobe-type-tools/afdko/pull/1720))
+- [makeotfexe] Add guards for h->otl == NULL before calling otlSubtableAdd ([#1716](https://github.com/adobe-type-tools/afdko/pull/1716))
+- [otfstemhist] Fix otfstemhist bugs ([#1703](https://github.com/adobe-type-tools/afdko/pull/1703))
+- [sfntedit] Fix bug when attempting to add non-existent file ([#1696](https://github.com/adobe-type-tools/afdko/pull/1696))
+- [documentation] Updates ([#1711](https://github.com/adobe-type-tools/afdko/pull/1711))
+- [requirements.txt] Update dependencies, remove psautohint from dependencies ([#1725](https://github.com/adobe-type-tools/afdko/pull/1725))
+- [ci] Add Python 3.11 to CI test matrix ([#1718](https://github.com/adobe-type-tools/afdko/pull/1718))
+
+4.0.0 (released 2023-09-11)
+---------------------------
+**The Python port of psautohint was (re)integrated into the AFDKO repository as "otfautohint"**
+
+Changes Summary:
+- [Name-Change] The name-change better reflects how hinted input is now published, and lets the new version coexist with the old version when needed.
+- [AFDKO Tools Updated] Other tools in AFDKO have been updated to call oftautohint instead of psautohint, and the dependency on the latter's repository has been removed.
+- [Stopping Psautohint Development] We expect to stop development of psautohint after this v4.0.0 release.
+- [Improvements] The new code fixes a number of bugs and in our judgement produces better results on average. It also uses a slightly different encoding in UFO glif files. Accordingly, users should expect that running the new code results in many differences compared with psautohint, but this should be a one-time change.
+- [Variable CFF Hinting] The new code also supports hinting of variable CFF-based fonts, including directly hinting a built CFF2 font. Glyphs that include overlap will typically be hinted close to how they would have been hinted with overlap removed.
+- [Hinting Time] Because psautohint was partly written in (very old) C code, and otfautohint is written entirely in Python, the new code takes significantly longer to hint an individual glyph. However, we have also enhanced otfautohint to hint different glyphs on multiple CPU cores by default. As a result the tool will be 5-8 times slower when running on a single core but will typically be slightly faster when running on 8 cores.
+
+More information can be found in [docs/otfautohint_Notes.md](https://github.com/adobe-type-tools/afdko/blob/develop/docs/otfautohint_Notes.md)
+
+Other changes in v4.0.0: dependency updates.
+
+3.9.7 (released 2023-08-14)
+---------------------------
+- [buildcff2vf] Don't return zero when input requires compatibilization ([#1668](https://github.com/adobe-type-tools/afdko/pull/1668))
+- [requirements.txt, tests, ttxn] Update dependencies ([#1663](https://github.com/adobe-type-tools/afdko/pull/1663), [#1675](https://github.com/adobe-type-tools/afdko/pull/1675))
+
+3.9.6 (released 2023-06-13)
+---------------------------
+- [requirements.txt] Update dependencies, unpin specific fonttools version to allow more versions ([#1661](https://github.com/adobe-type-tools/afdko/pull/1661))
+- [tx] fix segfaults due to old function call ([#1649](https://github.com/adobe-type-tools/afdko/pull/1649))
+- [hotconv] Fix warning for negative TypoLineGap ([#1654](https://github.com/adobe-type-tools/afdko/pull/1654)) (thanks, @NSGod!)
+- [hotconv] reset dsigCnt in hotReuse() so subsequent conversions add full stub 'DSIG' table ([#1648](https://github.com/adobe-type-tools/afdko/pull/1648)) (thanks, @NSGod!)
+- [hotconv] 'name': fix memory leak in addName() ([#1646](https://github.com/adobe-type-tools/afdko/pull/1646)) (thanks, @NSGod!)
+- [README] Remove LGTM badges ([#1650](https://github.com/adobe-type-tools/afdko/pull/1650)) (thanks, @miguelsousa!)
+
+3.9.5 (released 2023-04-24)
+---------------------------
+- [python] **Drop Python 3.7**
+  ([#1638](https://github.com/adobe-type-tools/afdko/pull/1638))
+- [tx] **tx/makeotf glyphOrder bug fix** 
+  ([#1642](https://github.com/adobe-type-tools/afdko/pull/1642))
+- [spot] fix name table LANG_TAG_REC_SIZE size definition (thanks, @NSGod!)
+  ([#1640](https://github.com/adobe-type-tools/afdko/pull/1640))
+- [docs] CID-keyed UFO guide
+  ([#1634](https://github.com/adobe-type-tools/afdko/pull/1634))
+- [requirements.txt][buildcff2vf_data] Update to fonttools v4.39.3
+  ([#1639](https://github.com/adobe-type-tools/afdko/pull/1639))
+
+3.9.4 (released 2023-04-06)
+---------------------------
+- [tx] FDArray support in CID-Keyed UFOs
+    - [tx][libxml2-improved] Move FDArray from fontinfo.plist to lib.plist ([#1576](https://github.com/adobe-type-tools/afdko/pull/1576))
+    - [tx] fix languagegroup visibility ([#1620](https://github.com/adobe-type-tools/afdko/pull/1620))
+    - [tx] Updates to CID-keyed UFO handling ([#1628](https://github.com/adobe-type-tools/afdko/pull/1628))
+    - [tx] revert missing cid fail to warn ([#1633](https://github.com/adobe-type-tools/afdko/pull/1633))
+- [makeotf] Fix GOADB order of processing multiple unicode assignments ([#1615](https://github.com/adobe-type-tools/afdko/pull/1615))
+- [spot] fix 'kern' subtable Format3 rightClass memory leak (double allocation) (thanks @NSGod!) ([#1627](https://github.com/adobe-type-tools/afdko/pull/1627))
+- Small fixes, updates: ([#1614](https://github.com/adobe-type-tools/afdko/pull/1614), [#1624](https://github.com/adobe-type-tools/afdko/pull/1624))
+
+3.9.3 (released 2023-02-02)
+---------------------------
+- CMake github workflow updates:
+  - Force static link of libxml2 on both windows and linux ([#1607](https://github.com/adobe-type-tools/afdko/pull/1607))
+- CMake libxml2 updates:
+  - Stop forcing static LibXML2 build on Linux ([#1601](https://github.com/adobe-type-tools/afdko/pull/1601))
+  - Unify cmake libxml build logic ([#1597](https://github.com/adobe-type-tools/afdko/pull/1597))
+- [docs] Formatting fix-up ([#1605](https://github.com/adobe-type-tools/afdko/pull/1605))
+- [tx] Restore stack-like behavior of parseGLIF transform pointer ([#1595](https://github.com/adobe-type-tools/afdko/pull/1595))
+
+3.9.2 (released 2023-01-10)
+---------------------------
+- tx:
+  - [tx] Always use blend for stem storage in cffwrite_t2cstr.c ([#1591](https://github.com/adobe-type-tools/afdko/pull/1591))
+  - [tx] [t2cstr] Use non-xxxVF paths in t2cstr when flattening and outputting CFF2 ([#1588](https://github.com/adobe-type-tools/afdko/pull/1588))
+  - UFO parsing:
+    - [tx] Replace UFO .glif file parsing with libxml2 ([#1556](https://github.com/adobe-type-tools/afdko/pull/1556))
+    - [tx] Replace UFO content.plist/glyphList parsing with libxml2 ([#1543](https://github.com/adobe-type-tools/afdko/pull/1543))
+    - [tx] Other related uforead & ufowrite parsing updates ([#1595](https://github.com/adobe-type-tools/afdko/pull/1595), [#1590](https://github.com/adobe-type-tools/afdko/pull/1590), [#1568](https://github.com/adobe-type-tools/afdko/pull/1568), [#1566](https://github.com/adobe-type-tools/afdko/pull/1566), [#1541](https://github.com/adobe-type-tools/afdko/pull/1541), [#1537](https://github.com/adobe-type-tools/afdko/pull/1537), [#1536](https://github.com/adobe-type-tools/afdko/pull/1536))
+- [dependencies] add renovate.json ([#1545](https://github.com/adobe-type-tools/afdko/pull/1545))
+- [agd.py] [comparefamily.py] Fixing the two instances of "rU" (thanks @colinmford !) ([#1584](https://github.com/adobe-type-tools/afdko/pull/1584))
+- [makeinstancesufo] Add --instance_info option to makeinstancesufo  ([#1577](https://github.com/adobe-type-tools/afdko/pull/1577))
+- [makeinstancesufo] Boost number of makeinstancesufo pool processors by one ([#1561](https://github.com/adobe-type-tools/afdko/pull/1561))
+- [otf2ttf] Ensure poolCapacity is at least 1 (thanks @Heptazhou !) ([#1530](https://github.com/adobe-type-tools/afdko/pull/1530))
+- [otf2ttf] Force maxPoolCapacity to be at least 1 (thanks @Heptazhou !)([#1529](https://github.com/adobe-type-tools/afdko/pull/1529))
+
+3.9.1 (released 2022-07-01)
+---------------------------
+- [CMake] Link LibXML2 statically for Linux for bug fix ([#1527](https://github.com/adobe-type-tools/afdko/pull/1527))
+- [makeotf][tx] Fix some linux compile problems with "bool" ([#1524](https://github.com/adobe-type-tools/afdko/pull/1524))
+- [tx] Replace UFO lib.plist parsing with libxml2 ([#1523](https://github.com/adobe-type-tools/afdko/pull/1523))
+
+3.9.0 (released 2022-06-23)
+---------------------------
+- [tx] Replace UFO fontinfo.plist parsing with libxml2 ([#1515](https://github.com/adobe-type-tools/afdko/pull/1515), [#1517](https://github.com/adobe-type-tools/afdko/pull/1517), [#1518](https://github.com/adobe-type-tools/afdko/pull/1518), [#1519](https://github.com/adobe-type-tools/afdko/pull/1519))
+- [makeotf] Copy va_list for second use (and add va_end's to avoid leaking) ([#1512](https://github.com/adobe-type-tools/afdko/pull/1512))
+- [requirements] updated dependencies
+
+3.8.3 (released 2022-05-09)
+---------------------------
+- [requirements] updated dependencies
+- [docs] Add links to previously opened Windows build issues ([#1505](https://github.com/adobe-type-tools/afdko/pull/1505))
+- [docs] Fix line wrap in feature file spec ([#1509](https://github.com/adobe-type-tools/afdko/pull/1509))
+- [ci] Enable Codecov informational checks ([#1501](https://github.com/adobe-type-tools/afdko/pull/1501))
+
+3.8.2 (released 2022-04-11)
+---------------------------
+- [tx] Fix Memory Crashes ([#1497](https://github.com/adobe-type-tools/afdko/pull/1497))
+- [antlr4] ANTLR v4.9.3 Upgrade ([#1491](https://github.com/adobe-type-tools/afdko/pull/1491))
+- [tx] ignore subr recursion limit ([#1484](https://github.com/adobe-type-tools/afdko/pull/1484))
+- [tx] Don't parse non-FDArray array of dictionaries in fontinfo.plist
+  ([#1478](https://github.com/adobe-type-tools/afdko/pull/1478))
+- [requirements] updated dependencies
+
+3.8.1 (released 2022-02-24)
+---------------------------
+- [tx] Add safety initialization of pdwCtx structure in pdwNew
+  ([#1474](https://github.com/adobe-type-tools/afdko/pull/1474))
+- [requirements] updated dependencies
+
+3.8.0 (released 2022-02-03)
+---------------------------
+- [python] **Drop Python 3.6, add Python 3.10 support**
+  ([#1456](https://github.com/adobe-type-tools/afdko/pull/1456))
+- [tx] Initialize variables in doFile
+  ([#1466](https://github.com/adobe-type-tools/afdko/pull/1466))
+- [ci] Build universal2 wheel instead of arm64 (thanks @miguelsousa!)
+  ([#1462](https://github.com/adobe-type-tools/afdko/pull/1462))
+- [ci] Add macOS arm64 wheel (thanks @miguelsousa!)
+  ([#1461](https://github.com/adobe-type-tools/afdko/pull/1461))
+- [c] Fix C-code coverage reporting (thanks @miguelsousa!)
+  ([#1460](https://github.com/adobe-type-tools/afdko/pull/1460))
+- [tx] Preserve intentional duplicate start points when PFA -> UFO
+  ([#1452](https://github.com/adobe-type-tools/afdko/pull/1452))
+- [tx] Fix unintentional duplicate start points caused by floating-value coordinates when PFA -> UFO
+  ([#1448](https://github.com/adobe-type-tools/afdko/pull/1448))
+- [README] Fix broken relative link in README
+  ([#1424](https://github.com/adobe-type-tools/afdko/pull/1424))
+- [ttxn] Update ttxn for fontTools 4.27.0 update
+  ([#1423](https://github.com/adobe-type-tools/afdko/pull/1423)
+  [#1418](https://github.com/adobe-type-tools/afdko/issues/1418))
+- [otf2ttf] Add throttling to OTF2TTF to avoid hangs on Windows with large CPU (thanks @be5invis!)
+  ([#1421](https://github.com/adobe-type-tools/afdko/pull/1421),
+   [#1420](https://github.com/adobe-type-tools/afdko/issues/1420))
+- [requirements] updated dependencies
+
+3.7.1 (released 2021-08-31)
+---------------------------
+- [makeotfexe] **Port of Feature File Parser to Antlr 4**
+  ([#548](https://github.com/adobe-type-tools/afdko/issues/548),
+   [#1367](https://github.com/adobe-type-tools/afdko/pull/1367))
+- [spec] **OpenType Feature File Specification updated to v1.26** with the following ([here](https://github.com/adobe-type-tools/afdko/blob/26761e9616f8a52aa14e7041ac9cbb0e139a1d83/docs/OpenTypeFeatureFileSpecification.md)):
+  - `include` directive is "statement-only" 
+  - with the exception of `mark`, keywords cannot be used as lookup names or tags
+  - list of valid characters for tags has been updated
+  - tags cannot start with a digit or hyphen
+- [build] Switch to CMake-based builds -- [see documentation](https://github.com/adobe-type-tools/afdko/blob/develop/docs/FDK_Build_Notes.md#build-system)
+  ([#1124](https://github.com/adobe-type-tools/afdko/issues/1124),
+   [#1360](https://github.com/adobe-type-tools/afdko/pull/1360),
+   [#1384](https://github.com/adobe-type-tools/afdko/pull/1384),
+   [#1372](https://github.com/adobe-type-tools/afdko/pull/1372))
+- [makeinstancesufo] fixes for fontMath 0.8.1 update
+  ([#1391](https://github.com/adobe-type-tools/afdko/pull/1391))
+- [tx] ufowrite for loop init declaration fix 
+  ([#1373](https://github.com/adobe-type-tools/afdko/pull/1373))
+- [tx] uforead deleting outlines fix
+  ([#1370](https://github.com/adobe-type-tools/afdko/pull/1370))
+- [tx] Windows line endings in binary files fix 
+  ([#1361](https://github.com/adobe-type-tools/afdko/pull/1361))
+- [makeotf] Fix for makeotf heap use after free
+  ([#1356](https://github.com/adobe-type-tools/afdko/pull/1356))
+- [tx] uforead, ufowrite, checkoutlinesufo fixes for reading & writing CID-keyed fonts 
+  ([#1353](https://github.com/adobe-type-tools/afdko/pull/1353))
+- [tx] t1read.c add error for fonts surpassing 65000 SID Limit 
+  ([#1347](https://github.com/adobe-type-tools/afdko/pull/1347))
+- [tx] cffread.c data type fix
+  ([#1344](https://github.com/adobe-type-tools/afdko/pull/1344))
+- [spec] Spec 6.4.iii: 'markClass' instead of 'mark' in example 4 (thanks @moyogo!)
+  ([#1336](https://github.com/adobe-type-tools/afdko/pull/1336))
+- [checkoutlinesufo] Moved list sort out of loop to not waste time sorting
+  ([#1331](https://github.com/adobe-type-tools/afdko/pull/1331))
+- [makeotf] aarch64 precision errors fix
+  ([#1329](https://github.com/adobe-type-tools/afdko/pull/1329))
+- [tests] Add cpplint check
+  ([#1325](https://github.com/adobe-type-tools/afdko/pull/1325))
+
 3.6.2 (released 2021-03-02)
 ---------------------------
 - [spec] Allow deleting glyphs via Multiple substitution (thanks @simoncozens!)

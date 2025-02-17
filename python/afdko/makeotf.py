@@ -26,7 +26,7 @@ if needed.
 """
 
 __version__ = """\
-makeotf.py v2.8.5 February 22 2021
+makeotf.py v2.9.0 June 1 2021
 """
 
 __methods__ = """
@@ -2701,8 +2701,8 @@ def runMakeOTF(makeOTFParams):
                 outputPath, tempPath, makeOTFParams.fontinfoPath)
             convertfonttocid.mergeFontToCFF(tempPath, outputPath, doSubr)
 
-        except(convertfonttocid.FontInfoParseError,
-               convertfonttocid.FontParseError):
+        except (convertfonttocid.FontInfoParseError,
+                convertfonttocid.FontParseError):
             raise
 
         if not os.path.exists(outputPath):
