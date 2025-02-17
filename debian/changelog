@@ -1,3 +1,42 @@
+afdko (4.0.1+dfsg1-2) unstable; urgency=medium
+
+  * Team upload.
+  * Source-only upload to allow testing migration.
+  * Rebuild against GCC 14. (Closes: #1074802)
+  * debian/control: Use dh-sequence-python3 to replace dh-python.
+
+ -- Boyuan Yang <byang@debian.org>  Fri, 26 Jul 2024 09:02:06 -0400
+
+afdko (4.0.1+dfsg1-1) unstable; urgency=medium
+
+  [ Blair Noctis ]
+  * Team upload.
+  * New upstream version 4.0.1+dfsg1 (Closes: #1076611)
+  * d/afdko.install:
+    - Install 2 new programs, otfautohint and otfstemhist
+  * d/control:
+    - Add dependency libxml2-dev
+  * d/rules:
+    - Set FORCE_SYSTEM_LIBXML2 for cmake in dh_auto_build
+    - Clean .eggs, _skbuild/
+  * d/watch:
+    - Update search rule (Closes: #1043455, thanks to anonymous contributor)
+  * d/patches:
+    - Add fix-escape-syntax-warning.patch
+
+  [ Yao Wei (魏銘廷) ]
+  * New upstream version 3.7.0~a9+dfsg1
+  * d/rules:
+    - Rebuild generated files under c/makeotf/lib/hotconv
+    - Strip tilde in python version number
+  * d/patches:
+    - Use system libantlr4
+    - Remove patches adding CPPFLAGS. Upstream migrated to cmake.
+  * d/copyright: Add ANTLR4 copyright information
+  * d/control: Add dependencies due to ANTLR4 addition
+
+ -- Blair Noctis <n@sail.ng>  Fri, 26 Jul 2024 14:05:43 +0900
+
 afdko (3.6.2+dfsg1-1) unstable; urgency=medium
 
   * New upstream version 3.6.2+dfsg1

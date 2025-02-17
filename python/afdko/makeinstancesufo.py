@@ -20,7 +20,7 @@ from fontTools.designspaceLib import (
 )
 
 from defcon import Font
-from psautohint.__main__ import main as psautohint
+from .otfautohint.__main__ import main as otfautohint
 from ufonormalizer import normalizeUFO
 from ufoProcessor import build as ufoProcessorBuild
 
@@ -86,7 +86,7 @@ def filterDesignspaceInstances(dsDoc, options):
 
 def updateInstance(fontInstancePath, options):
     """
-    Run checkoutlinesufo and psautohint, unless explicitly suppressed.
+    Run checkoutlinesufo and otfautohint, unless explicitly suppressed.
     """
     if options.doOverlapRemoval:
         logger.info("Doing overlap removal with checkoutlinesufo on %s ..." %
@@ -100,12 +100,12 @@ def updateInstance(fontInstancePath, options):
             raise
 
     if options.doAutoHint:
-        logger.info("Running psautohint on %s ..." % fontInstancePath)
+        logger.info("Running otfautohint on %s ..." % fontInstancePath)
         ah_args = ['--no-zones-stems', fontInstancePath]
         if options.no_round:
             ah_args.insert(0, '-d')
         try:
-            psautohint(ah_args)
+            otfautohint(ah_args)
         except (Exception, SystemExit):
             raise
 
@@ -113,7 +113,7 @@ def updateInstance(fontInstancePath, options):
 def clearCustomLibs(dFont):
     for key in list(dFont.lib.keys()):
         if key not in ['public.glyphOrder', 'public.postscriptNames']:
-            del(dFont.lib[key])
+            del dFont.lib[key]
 
     libGlyphs = [g for g in dFont if len(g.lib)]
     for g in libGlyphs:
@@ -148,6 +148,10 @@ def roundSelectedFontInfo(fontInfo):
             elif prop_name in ('postscriptBlueFuzz', 'postscriptBlueShift',
                                'postscriptSlantAngle'):
                 round_val = round(prop_val, 2)
+
+            elif prop_name == 'italicAngle':
+                round_val = round(prop_val)
+
             else:
                 round_val = int(round(prop_val))
 
@@ -191,10 +195,6 @@ def postProcessInstance(fontPath, options):
     clearCustomLibs(dFont)
 
     if options.no_round:
-        # '-r/--no-round' option was used but certain values (glyph widths,
-        # kerning values, font info values) still need to be rounded because
-        # of how they are stored in the final OTF
-        roundSelectedFontInfo(dFont.info)
         roundGlyphWidths(dFont)
         roundKerningValues(dFont)
     else:
@@ -202,6 +202,10 @@ def postProcessInstance(fontPath, options):
         # when 'roundGeometry' = False
         roundPostscriptBlueScale(dFont.info)
         roundKerningValues(dFont)
+    # even if '-r/--no-round' option was used, certain values (glyph widths,
+    # kerning values, font info values) still need to be rounded because
+    # of how they are stored in the final OTF
+    roundSelectedFontInfo(dFont.info)
 
     dFont.save()
 
@@ -300,6 +304,11 @@ def run(options):
     # instances, sources non-existent, other conditions
     validateDesignspaceDoc(ds_doc, options)
 
+    if options.instance_info:
+        for index, instance in enumerate(ds_doc.instances):
+            print(f'{index:3d} {instance.postScriptFontName}')
+        sys.exit()
+
     copy_features = any(src.copyFeatures for src in ds_doc.sources)
     features_store = {}
     if not copy_features:
@@ -325,7 +334,7 @@ def run(options):
 
     icnt_str = f'instance{"" if newInstancesCount == 1 else "s"}'
     tool_str = "fontTools.varlib" if options.useVarlib else "MutatorMath"
-    info_str = f"Building {newInstancesCount} {icnt_str} with {tool_str}..."
+    info_str = f"Building {newInstancesCount} {icnt_str} with {tool_str} ..."
     logger.info(info_str)
     ufoProcessorBuild(documentPath=dsPath,
                       outputUFOFormatVersion=options.ufo_version,
@@ -336,9 +345,9 @@ def run(options):
     if (dsPath != options.dsPath) and os.path.exists(dsPath):
         os.remove(dsPath)
 
-    logger.info("Built %s instances." % newInstancesCount)
+    logger.info(f"Built {newInstancesCount} {icnt_str}.")
     # Remove glyph.lib and font.lib (except for "public.glyphOrder")
-    pool = multiprocessing.Pool(os.cpu_count() - 1)
+    pool = multiprocessing.Pool(os.cpu_count())
     pool.starmap(postProcessInstance, [(instancePath, options)
                                        for instancePath in newInstancesList])
 
@@ -479,6 +488,11 @@ def get_options(args):
         type=int,
         help='specify the format version number of the generated UFOs\n'
              'Default: %(default)s'
+    )
+    parser.add_argument(
+        '--instance_info',
+        action='store_true',
+        help='list instance indexes'
     )
     options = parser.parse_args(args)
 

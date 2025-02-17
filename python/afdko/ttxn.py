@@ -232,8 +232,14 @@ def classChainContext(subtable, otlConv):
 
 
 def classExt(subtable, otlConv):
+    format = 1
+    if hasattr(subtable.ExtSubTable, "Format"):
+        format = subtable.ExtSubTable.Format
+    elif subtable.ExtensionLookupType == 7:
+        if hasattr(subtable.ExtSubTable, "ClassDef"):
+            format = 2
     handler = otlConv.classHandlers.get(
-        (subtable.ExtensionLookupType, subtable.ExtSubTable.Format), None)
+        (subtable.ExtensionLookupType, format), None)
     if handler:
         handler(subtable.ExtSubTable, otlConv)
 
@@ -1712,7 +1718,7 @@ class OTLConverter(object):
             for subtableIndex, subtable in enumerate(lookup.SubTable):
                 self.curSubTableIndex = subtableIndex
                 handler = self.classHandlers.get(
-                    (lookup.LookupType, subtable.Format))
+                    (lookup.LookupType, getattr(subtable, "Format", 1)))
                 if handler:
                     handler(subtable, self)
 
@@ -2007,7 +2013,7 @@ class TTXNTTFont(TTFont):
     def __init__(self, file=None, res_name_or_index=None,
                  sfntVersion="\000\001\000\000", flavor=None,
                  checkChecksums=False, verbose=None, recalcBBoxes=True,
-                 allowVID=False, ignoreDecompileErrors=False,
+                 ignoreDecompileErrors=False,
                  recalcTimestamp=True, fontNumber=-1, lazy=None, quiet=None,
                  supressHints=False, showExtensionFlag=False):
 
@@ -2017,7 +2023,7 @@ class TTXNTTFont(TTFont):
         TTFont. __init__(self, file, res_name_or_index=res_name_or_index,
                          sfntVersion=sfntVersion, flavor=flavor,
                          checkChecksums=checkChecksums, verbose=verbose,
-                         recalcBBoxes=recalcBBoxes, allowVID=allowVID,
+                         recalcBBoxes=recalcBBoxes,
                          ignoreDecompileErrors=ignoreDecompileErrors,
                          recalcTimestamp=recalcTimestamp,
                          fontNumber=fontNumber, lazy=lazy, quiet=quiet)
@@ -2069,7 +2075,8 @@ def dumpFont(writer, fontPath, supressHints=False):
     dictTxt = shellcmd([TX_TOOL, "-dump", "-0", fontPath])
     if curSystem == "Windows":
         dictTxt = re.sub(r"[\r\n]+", "\n", dictTxt)
-    dictTxt = re.sub(r"##[^\r\n]*Filename[^\r\n]+", "", dictTxt, 1).strip()
+    dictTxt = re.sub(r"##[^\r\n]*Filename[^\r\n]+", "",
+                     dictTxt, count=1).strip()
     dictLines = dictTxt.splitlines()
     writer.begintag("FontTopDict")
     writer.newline()
@@ -2111,7 +2118,7 @@ def ttnDump(input_file, output, options, showExtensionFlag, supressHints=False,
     if options.unicodedata:
         from fontTools.unicode import setUnicodeData
         setUnicodeData(options.unicodedata)
-    ttf = TTXNTTFont(input_file, 0, allowVID=options.allowVID,
+    ttf = TTXNTTFont(input_file, 0,
                      ignoreDecompileErrors=options.ignoreDecompileErrors,
                      fontNumber=options.fontNumber, supressHints=supressHints,
                      showExtensionFlag=showExtensionFlag)

@@ -2,16 +2,15 @@ import distutils.command.build_scripts
 import io
 import os
 import platform
-import subprocess
 import sys
 from distutils import log
 from distutils.dep_util import newer
 from distutils.util import convert_path
 from distutils.util import get_platform
 
-import setuptools.command.build_py
 import setuptools.command.install
-from setuptools import setup
+
+from skbuild import setup
 
 try:
     from wheel.bdist_wheel import bdist_wheel
@@ -51,38 +50,6 @@ class InstallPlatlib(setuptools.command.install.install):
     def finalize_options(self):
         setuptools.command.install.install.finalize_options(self)
         self.install_lib = self.install_platlib
-
-
-def compile_package(pkg_dir):
-    programs_dir = 'c'
-    platform_system = platform.system()
-    if platform_system == "Windows":
-        cmd = [os.path.abspath(os.path.join('c', 'buildall.cmd'))]
-        programs_dir = None
-    elif platform_system == "Linux":
-        cmd = ["sh", "buildalllinux.sh"]
-    elif platform_system == "Darwin":
-        cmd = ["sh", "buildall.sh"]
-    else:
-        # fallback to Linux
-        print(f'afdko: Unknown OS: {platform_system}')
-        cmd = ["sh", "buildalllinux.sh"]
-    cur_dir = os.getcwd()
-    try:
-        subprocess.run(cmd, cwd=programs_dir)
-    except subprocess.CalledProcessError:
-        print('afdko: Error executing build command.')
-        sys.exit(1)
-    os.chdir(cur_dir)
-
-
-class CustomBuild(setuptools.command.build_py.build_py):
-    """Custom build command."""
-
-    def run(self):
-        pkg_dir = 'afdko'
-        compile_package(pkg_dir)
-        setuptools.command.build_py.build_py.run(self)
 
 
 class CustomBuildScripts(distutils.command.build_scripts.build_scripts):
@@ -139,7 +106,7 @@ def _get_scripts():
     else:
         extension = ''
 
-    scripts = [f'c/build_all/{script_name}{extension}'
+    scripts = [f'bin/{script_name}{extension}'
                for script_name in script_names]
     return scripts
 
@@ -165,6 +132,8 @@ def _get_console_scripts():
         ('fontsetplot', 'proofpdf:fontsetplot'),
         ('hintplot', 'proofpdf:hintplot'),
         ('waterfallplot', 'proofpdf:waterfallplot'),
+        ('otfautohint', 'otfautohint.__main__:main'),
+        ('otfstemhist', 'otfautohint.__main__:stemhist'),
     ]
     scripts_path = 'afdko'
     scripts = [f'{name} = {scripts_path}.{entry}'
@@ -183,7 +152,7 @@ def main():
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.8',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: Microsoft :: Windows',
         'Operating System :: POSIX :: Linux',
@@ -213,7 +182,7 @@ def main():
           keywords='font development tools',
           platforms=[platform_name],
           package_dir={'': 'python'},
-          packages=['afdko', 'afdko.pdflib'],
+          packages=['afdko', 'afdko.pdflib', 'afdko.otfautohint'],
           include_package_data=True,
           package_data={
               'afdko': [
@@ -225,10 +194,13 @@ def main():
               ],
           },
           zip_safe=False,
-          python_requires='>=3.6',
+          python_requires='>=3.8',
           setup_requires=[
               'wheel',
               'setuptools_scm',
+              'scikit-build',
+              'cmake',
+              'ninja'
           ],
           tests_require=[
               'pytest',
@@ -239,7 +211,6 @@ def main():
               'console_scripts': _get_console_scripts(),
           },
           cmdclass={
-              'build_py': CustomBuild,
               'build_scripts': CustomBuildScripts,
               'bdist_wheel': CustomBDistWheel,
               'install': InstallPlatlib,

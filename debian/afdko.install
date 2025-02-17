@@ -13,6 +13,8 @@ debian/tmp/usr/bin/makeotf usr/libexec/afdko/
 debian/tmp/usr/bin/otc2otf usr/libexec/afdko/
 debian/tmp/usr/bin/otf2otc usr/libexec/afdko/
 debian/tmp/usr/bin/otf2ttf usr/libexec/afdko/
+debian/tmp/usr/bin/otfautohint usr/libexec/afdko/
+debian/tmp/usr/bin/otfstemhist usr/libexec/afdko/
 debian/tmp/usr/bin/ttfcomponentizer usr/libexec/afdko/
 debian/tmp/usr/bin/ttfdecomponentizer usr/libexec/afdko/
 debian/tmp/usr/bin/ttxn usr/libexec/afdko/

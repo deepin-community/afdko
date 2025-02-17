@@ -6,12 +6,12 @@ layout: default
 OpenType™ Feature File Specification
 ---
 
-Copyright 2015-2020 Adobe. All Rights Reserved. This software is licensed as
+Copyright 2015-2021 Adobe. All Rights Reserved. This software is licensed as
 OpenSource, under the Apache License, Version 2.0. This license is available at:
 http://opensource.org/licenses/Apache-2.0.
 
-Document version 1.25.1
-Last updated 5 July 2020
+Document version 1.26
+Last updated 7 June 2021
 
 **Caution: Portions of the syntax unimplemented by Adobe are subject to change.**
 
@@ -191,7 +191,7 @@ contexts.
 [`languagesystem`](#4.b.i)<br>
 [`lookup`](#4.e)<br>
 [`lookupflag`](#4.d)<br>
-[`mark`](#6.d)<br>
+[`mark`](#6.d) (can also be used as a [tag](#2.h) or [lookup block label](#2.i))<br>
 [`MarkAttachmentType`](#4.d)<br>
 [`markClass`](#4.f)<br>
 [`nameid`](#9.e)<br>
@@ -214,8 +214,8 @@ contexts.
 `excludeDFLT` (deprecated)<br>
 `includeDFLT` (deprecated)<br>
 
-
-The following are keywords only in their corresponding table/feature blocks:
+The following keywords are currently specific to these corresponding
+table/feature blocks:
 
 | keyword | table | implemented |
 | -- | -- | -- |
@@ -230,7 +230,6 @@ The following are keywords only in their corresponding table/feature blocks:
 | [`LigatureCaretByDev`](#9.b) | GDEF table | ❌ |
 | [`LigatureCaretByIndex`](#9.b) | GDEF table | ✅ |
 | [`LigatureCaretByPos`](#9.b) | GDEF table | ✅ |
-| [`MarkAttachClass`](#9.b) | GDEF table | ✅ |
 | [`FontRevision`](#9.c) | head table | ✅ |
 | [`Ascender`](#9.d) | hhea table | ✅ |
 | [`CaretOffset`](#9.d) | hhea table | ✅ |
@@ -616,6 +615,8 @@ supported for development glyph names:
     U+007C | Vertical bar
     U+007E ~ Tilde
 
+However, none of these characters are allowed at the start of a glyph name.
+
 For glyphs where the development glyph name differs from the final production
 glyph name, an implementation of the feature file syntax must be able to accept
 either name in source files, but must produce output data which contains either
@@ -704,8 +705,7 @@ A range of glyphs is denoted by a hyphen:
 [<firstGlyph> - <lastGlyph>]
 ```
 
-Spaces around the hyphen are not required since hyphens are not permitted in
-feature file glyph names. For example:
+Spaces around the hyphen are not required, so these are also valid ranges:
 
 ```fea
 [\0-\31]
@@ -769,7 +769,8 @@ space @dash space                       # Usage
 ```
 
 The part of the glyph class name after the “@” is subject to the same name
-restrictions that apply to a glyph name.
+restrictions that apply to a production glyph name except that hyphens are
+also allowed.
 
 Glyph class assignments can appear anywhere in the feature file. A glyph class
 name may be used in the feature file only after its definition.
@@ -825,14 +826,39 @@ DEU
 
 Note that the final space in the example is implicit.
 
-The special language tag `dflt` denotes the default language system of the
+A tag can only have characters from the following set:
+
+    ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    abcdefghijklmnopqrstuvwxyz
+    0123456789
+    .  # period
+    _  # underscore
+    !  # Exclamation point
+    $  # Dollar sign
+    %  # Percent sign
+    &  # Ampersand
+    *  # Asterisk
+    +  # Plus sign
+    :  # Colon
+    ?  # Question mark
+    ^  # Caret
+    '  # Back-quote
+    |  # Vertical bar
+    ~  # Tilde
+
+and must not start with a digit or hyphen. However, use of characters beyond
+those in production glyph names is not recommended.
+
+The keyword `mark` is a valid tag but other (short) keywords are not.  The
+special language tag `dflt` denotes the default language system of the
 corresponding script.
 
 <a name="2.i"></a>
 ### 2.i. Lookup block labels
 
-The same length and name restrictions that apply to a glyph name apply to a
-lookup block label.
+The same length and name restrictions that apply to a production glyph name
+apply to a lookup block label.  For historical reasons the keyword `mark' also
+accepted as a label but other keywords are not.
 
 <a name="3"></a>
 ## 3. Including files
@@ -848,6 +874,12 @@ For example:
 ```fea
 include(../family.fea);
 ```
+
+An include directive is valid in any context that otherwise contains statements
+ending in semicolons: "Top-level" statements; `feature`, `lookup`, `table`,
+`cvParameter`, and `AxisValue` blocks; and `name` groups. (An implementation
+that processes include statements at the token level is not required to enforce
+these restrictions.)
 
 The implementation software is responsible for handling the search paths for the
 location of the included files.
@@ -1565,6 +1597,8 @@ has no replacement, removing the input glyph from the glyph sequence:
 substitute a by NULL;
 ```
 
+Omitting the `by` clause is equivalent to adding `by NULL`. 
+
 <a name="5.b"></a>
 ### 5.b. [GSUB LookupType 2] Multiple substitution
 
@@ -1937,6 +1971,10 @@ The rule is specified as follows:
 reversesub [a e n] d' by d.alt;
 ```
 
+As with `substitute`, if the replacement glyph is the reserved word `NULL`
+then the reverse substitution has no replacement, removing the glyph from the
+sequence.  Omitting the `by` clause is equivalent to adding `by NULL`. 
+
 <a name="6"></a>
 ## 6. Glyph positioning (GPOS) rules
 
@@ -2101,9 +2139,9 @@ special column title. When you specify the value of a class pair, you are
 specifying the value in only one cell of the spreadsheet. When you specify a
 series of kern pair rules between a particular left side class and a series of
 right side classes, you are filling in a series of cells in the row for the
-specific left side class. All cells for which no values are specified are set to
-0. When programs look for a kern value between “Ygrave” and something else, they
-look through the list of left side class definitions to find the first
+specific left side class. All cells for which no values are specified are set
+to 0. When programs look for a kern value between “Ygrave” and something
+else, they look through the list of left side class definitions to find the first
 occurrence of “Ygrave”. By definition, the first spreadsheet row which includes
 “Ygrave” will define the kern pair value of “Ygrave” with all other right-side
 classes, e.g spreadsheet columns. Since a pair value with a right-side period
@@ -2519,7 +2557,7 @@ context, you need to put the mark and kern rules in different lookups.
 ###### Example 4:
 
 ```fea
-mark sukun <anchor 0 0> @TOP_CLASS;
+markClass sukun <anchor 0 0> @TOP_CLASS;
 
 lookup MARK_POS {
     position base lam_meem_jeem' <anchor 625 1800> mark @TOP_CLASS alef;
@@ -2606,7 +2644,7 @@ For all three forms of the mark attachment rules - Mark-To-Base,
 Mark-To-Ligature, and Mark-To-Mark - the contextual form of the positioning
 rules consist of inserting glyph sequences in one or more of three places in the
 rule:
-   1. before the initial 'base | ligature | mark' keyword
+   1. before the initial `base`, `ligature`, or `mark` keyword
    2. after the base glyph or glyph class
    3. after all the anchor-mark class clauses
 
@@ -3959,6 +3997,12 @@ along with the tag `sbit`.
 
 <a name="11"></a>
 ## 11. Document revisions
+
+**v1.26 [7 June 2021]:**
+*   Clarified syntax of [keywords](#2.c), [glyph names](#2.f.i), 
+    [named glyph classes](#2.g.iii), [tags](#2.h),
+    [lookup block labels](#2.i), and [include directives](#3), 
+    in light of new makeotfexe parser implementation.
 
 **v1.25.1 [5 July 2020]:**
 *   Added information and examples to [STAT table](#9.e)

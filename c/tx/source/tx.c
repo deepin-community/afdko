@@ -8,7 +8,7 @@
 
 #include "tx_shared.h"
 
-#define TX_VERSION CTL_MAKE_VERSION(1, 2, 3)
+#define TX_VERSION CTL_MAKE_VERSION(1, 3, 0)
 
 #include "varread.h"
 
@@ -372,6 +372,9 @@ static void doFile(txCtx h, char *srcname) {
     char *p;
     struct stat fileStat;
     int statErrNo;
+
+    /* initialize fileStat */
+    memset(&fileStat, 0, sizeof(struct stat));
 
     /* Set src name */
     if (h->file.sr != NULL) {
@@ -1551,6 +1554,10 @@ int CTL_CDECL main(int argc, char *argv[]) {
        correct unbuffered mode */
     (void)setvbuf(stderr, NULL, _IONBF, 0);
 #endif /* PLAT_WIN */
+
+#if _MSC_VER
+    _setmode(_fileno(stdout), _O_BINARY);
+#endif
 
     /* Get program name */
     progname = tail(argv[0]);
